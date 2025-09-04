@@ -75,6 +75,24 @@ vim.opt.scrolloff = 10
 -- See `:help 'confirm'`
 vim.opt.confirm = true
 
+-- CUSTOM: set yaml.ansible filetype when the filetype looks like it's an Ansible project
+-- may not work 100% of the time, but does in most of them
+vim.filetype.add {
+  pattern = {
+    ['.*/ansible/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/defaults/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/host_vars/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/group_vars/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/group_vars/.*/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/playbook.*.ya?ml'] = 'yaml.ansible',
+    ['.*/playbooks/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/roles/.*/tasks/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/roles/.*/handlers/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/tasks/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/molecule/.*.ya?ml'] = 'yaml.ansible',
+  },
+}
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -589,6 +607,7 @@ require('lazy').setup({
         -- gopls = {},
         -- pyright = {},
         rust_analyzer = {},
+        ansiblels = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
