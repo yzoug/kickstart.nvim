@@ -98,6 +98,24 @@ vim.filetype.add {
   },
 }
 
+-- CUSTOM: set yaml.ansible filetype when the filetype looks like it's an Ansible project
+-- may not work 100% of the time, but does in most of them
+vim.filetype.add {
+  pattern = {
+    ['.*/ansible/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/defaults/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/host_vars/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/group_vars/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/group_vars/.*/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/playbook.*.ya?ml'] = 'yaml.ansible',
+    ['.*/playbooks/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/roles/.*/tasks/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/roles/.*/handlers/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/tasks/.*.ya?ml'] = 'yaml.ansible',
+    ['.*/molecule/.*.ya?ml'] = 'yaml.ansible',
+  },
+}
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -787,6 +805,7 @@ require('lazy').setup({
         -- you will need to read `:help ins-completion`
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
+
         --
         -- All presets have the following mappings:
         -- <tab>/<s-tab>: move to right/left of your snippet expansion
