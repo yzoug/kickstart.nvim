@@ -569,6 +569,7 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
+        biome = {},
         rust_analyzer = {},
         ansiblels = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -772,7 +773,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-moon'
+      vim.cmd.colorscheme 'tokyonight-storm'
     end,
   },
 
@@ -803,26 +804,43 @@ require('lazy').setup({
         local status = require('ollama').status()
 
         if status == 'IDLE' then
-          return '󱙺'
+          return ' LLM 󱙺 '
         elseif status == 'WORKING' then
-          return '󰚩'
+          return ' LLM 󰚩 '
         end
       end
 
       -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      -- cf https://github.com/nvim-mini/mini.nvim/discussions/819
+      local active_content = function()
+        local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
+        local git = MiniStatusline.section_git { trunc_width = 40 }
+        local diff = MiniStatusline.section_diff { trunc_width = 75 }
+        local diagnostics = MiniStatusline.section_diagnostics { trunc_width = 75 }
+        local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
+        local filename = MiniStatusline.section_filename { trunc_width = 140 }
+        local fileinfo = MiniStatusline.section_fileinfo { trunc_width = 120 }
+        -- added for Ollama status update
+        local ollama_status = get_ollama_status_icon()
+        -- overwriting the default location string, and disabling search count (already displayed)
+        -- check statusline's lua code, the default is "%2l|%-2v"
+        local location = ' %2l:%-2v'
 
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
+        return MiniStatusline.combine_groups {
+          { hl = mode_hl, strings = { mode } },
+          { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
+          '%<', -- Mark general truncate point
+          { hl = 'MiniStatuslineFilename', strings = { filename } },
+          '%=', -- End left alignment
+          { hl = 'MiniStatuslineFileinfo', strings = { fileinfo, ollama_status } },
+          { hl = mode, strings = { location } },
+        }
       end
+
+      require('mini.statusline').setup {
+        content = { active = active_content },
+        use_icons = vim.g.have_nerd_font,
+      }
 
       -- CUSTOM: add tabline
       require('mini.tabline').setup()
