@@ -192,7 +192,6 @@ rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
--- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added via a link or github org/name. To run setup automatically, use `opts = {}`
   --{ 'NMAC427/guess-indent.nvim', opts = {} },
@@ -200,6 +199,7 @@ require('lazy').setup({
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
   --    {
+  -- CUSTOM: gitsigns is managed in its separate plugin file, see very end to this file
   --        'lewis6991/gitsigns.nvim',
   --        config = function()
   --            require('gitsigns').setup({
@@ -212,7 +212,6 @@ require('lazy').setup({
   -- options to `gitsigns.nvim`.
   --
   -- See `:help gitsigns` to understand what the configuration keys do
-  -- CUSTOM: managed in its separate plugin file, see very end to this file
   -- { -- Adds git related signs to the gutter, as well as utilities for managing changes
   --   'lewis6991/gitsigns.nvim',
   --   --@module 'gitsigns'
@@ -252,7 +251,12 @@ require('lazy').setup({
     opts = {
       -- delay between pressing a key and opening which-key (milliseconds)
       delay = 0,
-      icons = { mappings = vim.g.have_nerd_font },
+      icons = {
+        -- set icon mappings to true if you have a Nerd Font
+        -- and keys to empty dict to use the which-key icons
+        mappings = vim.g.have_nerd_font,
+        keys = {},
+      },
 
       -- Document existing key chains
       spec = {
@@ -305,24 +309,14 @@ require('lazy').setup({
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
-      -- Telescope is a fuzzy finder that comes with a lot of different things that
-      -- it can fuzzy find! It's more than just a "file finder", it can search
-      -- many different aspects of Neovim, your workspace, LSP, and more!
-      --
       -- The easiest way to use Telescope, is to start by doing something like:
       --  :Telescope help_tags
-      --
-      -- After running this command, a window will open up and you're able to
-      -- type in the prompt window. You'll see a list of `help_tags` options and
-      -- a corresponding preview of the help.
       --
       -- Two important keymaps to use while in Telescope are:
       --  - Insert mode: <c-/>
       --  - Normal mode: ?
-      --
       -- This opens a window that shows you all of the keymaps for the current
-      -- Telescope picker. This is really useful to discover what Telescope can
-      -- do as well as how to actually do it!
+      -- Telescope picker.
 
       -- Added a helper to open multiple files if more than one is selected
       -- see https://github.com/nvim-telescope/telescope.nvim/issues/1048#issuecomment-1679797700
@@ -373,7 +367,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
-      -- CUSTOM: I switch these two keybindings from custom
+      -- CUSTOM: I switch these two keybindings
       vim.keymap.set('n', '<leader><leader>', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>sr', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
@@ -465,31 +459,6 @@ require('lazy').setup({
       'saghen/blink.cmp',
     },
     config = function()
-      -- Brief aside: **What is LSP?**
-      --
-      -- LSP is an initialism you've probably heard, but might not understand what it is.
-      --
-      -- LSP stands for Language Server Protocol. It's a protocol that helps editors
-      -- and language tooling communicate in a standardized fashion.
-      --
-      -- In general, you have a "server" which is some tool built to understand a particular
-      -- language (such as `gopls`, `lua_ls`, `rust_analyzer`, etc.). These Language Servers
-      -- (sometimes called LSP servers, but that's kind of like ATM Machine) are standalone
-      -- processes that communicate with some "client" - in this case, Neovim!
-      --
-      -- LSP provides Neovim with features like:
-      --  - Go to definition
-      --  - Find references
-      --  - Autocompletion
-      --  - Symbol Search
-      --  - and more!
-      --
-      -- Thus, Language Servers are external tools that must be installed separately from
-      -- Neovim. This is where `mason` and related plugins come into play.
-      --
-      -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
-      -- and elegantly composed help section, `:help lsp-vs-treesitter`
-
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
@@ -716,8 +685,6 @@ require('lazy').setup({
         -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
         -- <c-e>: Hide menu
         -- <c-k>: Toggle signature help
-        --
-        -- See :h blink-cmp-config-keymap for defining your own keymap
         preset = 'default',
       },
 
@@ -740,13 +707,6 @@ require('lazy').setup({
 
       snippets = { preset = 'luasnip' },
 
-      -- Blink.cmp includes an optional, recommended rust fuzzy matcher,
-      -- which automatically downloads a prebuilt binary when enabled.
-      --
-      -- By default, we use the Lua implementation instead, but you may enable
-      -- the rust implementation via `'prefer_rust_with_warning'`
-      --
-      -- See :h blink-cmp-config-fuzzy for more information
       fuzzy = { implementation = 'lua' },
 
       -- Shows a signature help window while you type arguments for a function
@@ -804,6 +764,18 @@ require('lazy').setup({
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
+
+      -- CUSTOM: add Ollama section to statusline
+      -- Define a function to check the status and return the corresponding icon
+      local function get_ollama_status_icon()
+        local status = require('ollama').status()
+
+        if status == 'IDLE' then
+          return '󱙺'
+        elseif status == 'WORKING' then
+          return '󰚩'
+        end
+      end
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
