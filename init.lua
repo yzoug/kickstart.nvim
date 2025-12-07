@@ -807,49 +807,20 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- CUSTOM: add Ollama section to statusline
-      -- Define a function to check the status and return the corresponding icon
-      local function get_ollama_status_icon()
-        local status = require('ollama').status()
-
-        if status == 'IDLE' then
-          return ' LLM 󱙺 '
-        elseif status == 'WORKING' then
-          return ' LLM 󰚩 '
-        end
-      end
-
       -- Simple and easy statusline.
-      -- cf https://github.com/nvim-mini/mini.nvim/discussions/819
-      local active_content = function()
-        local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
-        local git = MiniStatusline.section_git { trunc_width = 40 }
-        local diff = MiniStatusline.section_diff { trunc_width = 75 }
-        local diagnostics = MiniStatusline.section_diagnostics { trunc_width = 75 }
-        local lsp = MiniStatusline.section_lsp { trunc_width = 75 }
-        local filename = MiniStatusline.section_filename { trunc_width = 140 }
-        local fileinfo = MiniStatusline.section_fileinfo { trunc_width = 120 }
-        -- added for Ollama status update
-        local ollama_status = get_ollama_status_icon()
-        -- overwriting the default location string, and disabling search count (already displayed)
-        -- check statusline's lua code, the default is "%2l|%-2v"
-        local location = ' %2l:%-2v'
+      --  You could remove this setup call if you don't like it,
+      --  and try some other statusline plugin
+      local statusline = require 'mini.statusline'
+      -- set use_icons to true if you have a Nerd Font
+      statusline.setup { use_icons = vim.g.have_nerd_font }
 
-        return MiniStatusline.combine_groups {
-          { hl = mode_hl, strings = { mode } },
-          { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
-          '%<', -- Mark general truncate point
-          { hl = 'MiniStatuslineFilename', strings = { filename } },
-          '%=', -- End left alignment
-          { hl = 'MiniStatuslineFileinfo', strings = { fileinfo, ollama_status } },
-          { hl = mode, strings = { location } },
-        }
+      -- You can configure sections in the statusline by overriding their
+      -- default behavior. For example, here we set the section for
+      -- cursor location to LINE:COLUMN
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_location = function()
+        return '%2l:%-2v'
       end
-
-      require('mini.statusline').setup {
-        content = { active = active_content },
-        use_icons = vim.g.have_nerd_font,
-      }
 
       -- CUSTOM: add tabline
       require('mini.tabline').setup()
