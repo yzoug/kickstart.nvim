@@ -80,7 +80,7 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
--- CUSTOM: set yaml.ansible filetype when the filetype looks like it's an Ansible project
+-- WARN: set yaml.ansible filetype when the filetype looks like it's an Ansible project
 -- may not work 100% of the time, but does in most of them
 vim.filetype.add {
   pattern = {
@@ -106,7 +106,7 @@ vim.filetype.add {
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
--- CUSTOM: Replaced by my usual use of leader + q, close current buffer
+-- WARN: Replaced by my usual use of leader + q, close current buffer
 vim.keymap.set('n', '<leader>q', ':bd<CR>', { desc = '[Q]uit current buffer' })
 vim.keymap.set('n', '<leader>d', vim.diagnostic.setloclist, { desc = 'Open [D]iagnostic quickfix list' })
 
@@ -124,11 +124,11 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
--- CUSTOM: left/right arrows to switch between buffers
+-- WARN: left/right arrows to switch between buffers
 vim.keymap.set('n', '<left>', ':bp<CR>')
 vim.keymap.set('n', '<right>', ':bn<CR>')
 
--- CUSTOM: keymap to execute current file
+-- WARN: keymap to execute current file
 vim.keymap.set('n', '<leader>x', ':!%:p<CR>', { desc = 'E[X]ecute current buffer' })
 
 -- Keybinds to make split navigation easier.
@@ -185,7 +185,7 @@ rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
-require('lazy').setup({
+require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   -- 'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
 
@@ -198,7 +198,7 @@ require('lazy').setup({
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
   --    {
-  -- CUSTOM: gitsigns is managed in its separate plugin file, see very end to this file
+  -- WARN: gitsigns is managed in its separate plugin file, see very end to this file
   --        'lewis6991/gitsigns.nvim',
   --        config = function()
   --            require('gitsigns').setup({
@@ -302,8 +302,8 @@ require('lazy').setup({
       --  - Normal mode: ?
       -- This opens a window that shows you all of the keymaps for the current
       -- Telescope picker.
-
-      -- Added a helper to open multiple files if more than one is selected
+      --
+      -- WARN: Added a helper to open multiple files if more than one is selected
       -- see https://github.com/nvim-telescope/telescope.nvim/issues/1048#issuecomment-1679797700
       local select_one_or_multi = function(prompt_bufnr)
         local picker = require('telescope.actions.state').get_current_picker(prompt_bufnr)
@@ -325,7 +325,7 @@ require('lazy').setup({
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
-        --
+        -- WARN: using my custom selection defined above
         defaults = {
           mappings = {
             i = { ['<CR>'] = select_one_or_multi },
@@ -353,7 +353,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      -- CUSTOM: I switch these two keybindings
+      -- WARN: I switch these two keybindings
       vim.keymap.set('n', '<leader><leader>', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>sr', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
@@ -420,11 +420,6 @@ require('lazy').setup({
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself.
-          --
-          -- In this case, we create a function that lets us more easily define mappings specific
-          -- for LSP related items. It sets the mode, buffer and description for us each time.
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
@@ -514,7 +509,7 @@ require('lazy').setup({
           --
           -- This may be unwanted, since they displace some of your code
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-            -- CUSTOM: trying out always enabling inlay hints when possible
+            -- WARN: trying out always enabling inlay hints when possible
             vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
@@ -743,12 +738,12 @@ require('lazy').setup({
 
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
-        -- CUSTOM: `auto_show = true` to show the documentation after a delay.
+        -- WARN: `auto_show = true` to show the documentation after a delay.
         documentation = { auto_show = true, auto_show_delay_ms = 500 },
       },
 
       sources = {
-        -- CUSTOM: added buffer as source
+        -- WARN: added buffer as source
         default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer' },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
@@ -822,7 +817,7 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      -- CUSTOM: add tabline
+      -- WARN: add tabline
       require('mini.tabline').setup()
 
       -- ... and there is more!
