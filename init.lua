@@ -354,6 +354,15 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader><leader>', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>sr', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
+      --WARN: Added custom find_files picker which shows all files, even those in gitignore
+      local find_files_no_ignore = function()
+        local opts = {
+          hidden = true,
+        }
+        builtin.find_files(opts)
+      end
+      vim.keymap.set('n', '<leader>sa', find_files_no_ignore, { desc = '[S]earch [A]ll Files' })
+
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
