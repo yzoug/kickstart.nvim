@@ -405,6 +405,16 @@ require('lazy').setup({
       })
 
       -- Override default behavior and theme when searching
+      --WARN: Added custom find_files picker which shows all files, even those in gitignore
+      local find_files_no_ignore = function()
+        local opts = {
+          hidden = true,
+        }
+        builtin.find_files(opts)
+      end
+      vim.keymap.set('n', '<leader>sa', find_files_no_ignore, { desc = '[S]earch [A]ll Files' })
+
+      -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
