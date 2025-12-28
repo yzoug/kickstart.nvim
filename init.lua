@@ -538,7 +538,8 @@ require('lazy').setup {
             [vim.diagnostic.severity.HINT] = '󰌶 ',
           },
         },
-        virtual_text = {
+        -- WARN: display diagnostics as virtual lines instead of at end of line
+        virtual_lines = {
           source = 'if_many',
           spacing = 2,
           format = function(diagnostic)
